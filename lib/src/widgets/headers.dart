@@ -68,6 +68,7 @@ class _HeaderDiagonalPainter extends CustomPainter {
 
 
     canvas.drawPath(path, lapiz);
+  
 
 
   }

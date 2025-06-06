@@ -28,18 +28,42 @@ class _CuadradoAnimadoState extends State<CuadradoAnimado> with SingleTickerProv
   late AnimationController controller;
   late Animation<double> rotacion;
 
+  late Animation<double> opacidad;
+  late Animation<double> opacidadOut;
+
+  late Animation<double> moverDerecha;
+
+   late Animation<double> agrandar;
+
   @override
   void initState() {
     controller = AnimationController(vsync: this,duration: Duration(milliseconds: 4000));
     
-    rotacion = Tween(begin: 0.0, end: 2 * Math.pi).animate(controller);
+    rotacion = Tween(begin: 0.0, end: 2 * Math.pi).animate(
+      CurvedAnimation(parent: controller, curve: Curves.bounceOut)
+    );
+
+    opacidad = Tween(begin: 0.1,end: 1.0).animate(
+      CurvedAnimation(parent: controller,curve: Interval(0.0, 0.25,curve: Curves.easeOut)));
+
+    
+    opacidadOut = Tween(begin: 0.0,end: 1.0).animate(
+      CurvedAnimation(parent: controller,curve: Interval(0.75, 1.0,curve: Curves.easeOut)));
+
+
+    moverDerecha = Tween(begin: 0.0,end: 200.0).animate(
+      CurvedAnimation(parent: controller, curve: Curves.easeOut));
+
+    agrandar = Tween(begin: 0.0,end: 2.0).animate(
+      CurvedAnimation(parent: controller, curve: Curves.easeOut));
 
 
     controller.addListener((){
 
-      print('Status: ${controller.status}');
+      //print('Status: ${controller.status}');
       if(controller.status== AnimationStatus.completed){
-        controller.reverse();
+        //controller.reverse();
+        controller.reset();
       } 
       /*else if(controller.status== AnimationStatus.dismissed){
         controller.forward();
@@ -69,11 +93,24 @@ class _CuadradoAnimadoState extends State<CuadradoAnimado> with SingleTickerProv
       //child: child,
       builder: (BuildContext context, Widget? child) {
 
-        print("Rotación: $rotacion.value.toString()");
+        print('Opacidad: ${opacidad.status}');
+        print('Rotación: ${rotacion.status}');
 
-        return Transform.rotate(
-          angle: rotacion.value,
-          child: _Rectangulo());
+        print('Opacidad value: ${opacidad.value}');
+        print('Rotación value: ${rotacion.value}');
+
+        //print("Rotación: $rotacion.value.toString()");
+
+        return Transform.translate(
+          offset: Offset(moverDerecha.value, 0),
+          child: Transform.rotate(
+            angle: rotacion.value,
+            child: Opacity(
+              opacity: opacidad.value - opacidadOut.value,
+              child: Transform.scale(
+                scale: agrandar.value,
+                child: _Rectangulo()))),
+        );
       },
     );
   }
